@@ -1,4 +1,3 @@
-
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import { getGallery, totalPages } from "./js/api-set";
