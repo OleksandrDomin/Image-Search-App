@@ -1,7 +1,6 @@
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import { getGallery, totalPages } from "./js/api-set";
-import { scroll } from "./js/scroll";
 import { createGalleryItem } from "./js/createMarkup";
 import Notiflix from "notiflix";
 
@@ -9,29 +8,33 @@ export { gallery };
 
 const form = document.querySelector("#search-form");
 const gallery = document.querySelector(".gallery");
+// const btnLoad = document.querySelector('.load-more');
 const guard = document.querySelector(".guard");
+let query = "";
+let page = 1;
 const lightbox = new SimpleLightbox(".gallery a");
 const options = {
   root: null,
-  rootMargin: "200px",
+  rootMargin: "100px",
   threshold: 0
 };
-const observer = new IntersectionObserver(onPagination, options);
-let query = "";
-let page = 1;
 
-// const btnLoad = document.querySelector('.load-more');
+const observer = new IntersectionObserver(onPagination, options);
 
 form.addEventListener("change", onInput);
 form.addEventListener("submit", onSubmit);
 // btnLoad.addEventListener('click', onClick);
-
 async function addGallerySubmit() {
   try {
-    const response = await getGallery(query, page);
-    addImages(response);
-    if (page !== totalPages) {
-      observer.observe(guard);
+    if (!query.length) {
+      Notiflix.Notify.failure("Please, enter a search query");
+      return;
+    } else {
+      const response = await getGallery(query, page);
+      addImages(response);
+      if (page !== totalPages) {
+        observer.observe(guard);
+      }
     }
   } catch (error) {
     console.error(error);
@@ -40,17 +43,19 @@ async function addGallerySubmit() {
 
 async function addGalleryPag() {
   try {
-    scroll();
     const response = await getGallery(query, page);
     const images = response.data.hits;
+
     createGalleryItem(images);
     lightbox.refresh();
 
     if (page > totalPages) {
-      // evt.target.classList.add('btn-hidden');
+      //     evt.target.classList.add('btn-hidden');
+
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
+      observer.unobserve(guard);
     }
   } catch (error) {
     console.error(error);
@@ -67,9 +72,9 @@ function onSubmit(evt) {
   page = 1;
   gallery.innerHTML = "";
   //   btnLoad.classList.add('btn-hidden');
-
   if (!evt.target.elements.searchQuery.value) {
     Notiflix.Notify.failure("Please, enter a search query");
+    return;
   } else {
     addGallerySubmit();
   }
@@ -77,12 +82,12 @@ function onSubmit(evt) {
 
 function addImages(response) {
   const images = response.data.hits;
-
   if (!images.length) {
     gallery.innerHTML = "";
     Notiflix.Notify.failure(
       "Sorry, there are no images matching your search query. Please try again."
     );
+    return;
   } else {
     createGalleryItem(images);
     Notiflix.Notify.success(
@@ -94,7 +99,7 @@ function addImages(response) {
 
 function onPagination(entries, observer) {
   entries.forEach(entry => {
-    console.log(entry);
+    // console.log(entry);
     if (entry.isIntersecting) {
       page += 1;
       addGalleryPag();
@@ -104,6 +109,17 @@ function onPagination(entries, observer) {
     }
   });
 }
+
+// function onClick(evt) {
+//   page += 1;
+//   addGalleryClick();
+//   if (page > totalPages) {
+//     evt.target.classList.add('btn-hidden');
+//     Notiflix.Notify.warning(
+//       "We're sorry, but you've reached the end of search results."
+//     );
+//   }
+// }
 
 // async function addGalleryClick() {
 //   try {
@@ -120,13 +136,3 @@ function onPagination(entries, observer) {
 //   }
 // }
 
-// function onClick(evt) {
-//   page += 1;
-//   addGalleryClick();
-//   if (page > totalPages) {
-//     evt.target.classList.add('btn-hidden');
-//     Notiflix.Notify.warning(
-//       "We're sorry, but you've reached the end of search results."
-//     );
-//   }
-// }

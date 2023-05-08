@@ -13,6 +13,7 @@ async function getGallery(query, page) {
     safesearch: true,
     per_page: per_page,
     page: page
+    
   });
 
   const response = await axios.get(`https://pixabay.com/api/?${params}`);
