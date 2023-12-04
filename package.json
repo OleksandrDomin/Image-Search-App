@@ -2,10 +2,10 @@
   "name": "Image-Search-App",
   "version": "2.0.0",
   "description": "",
-  "homepage": "https://OleksandrDomin.github.io/Image-Search-App",
+  "homepage": "https://OleksandrDomin.github.io/goit-js-hw-11",
   "scripts": {
     "start": "parcel src/*.html",
-    "build": "parcel build src/*.html --public-url /Image-Search-App/"
+    "build": "parcel build src/*.html --public-url /goit-js-hw-11/"
   },
   "repository": {
     "type": "git",
